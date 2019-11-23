@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"strconv"
+	"time"
 )
 
 type BlockChain struct {
@@ -11,19 +13,21 @@ type BlockChain struct {
 }
 
 type Block struct {
-	Hash     []byte
-	Data     []byte
-	PrevHash []byte
+	Timestamp int64
+	Hash      []byte
+	Data      []byte
+	PrevHash  []byte
 }
 
 func (b *Block) DeriveHash() {
-	info := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
+	timestamp := []byte(strconv.FormatInt(b.Timestamp, 10))
+	info := bytes.Join([][]byte{b.Data, b.PrevHash, timestamp}, []byte{})
 	hash := sha256.Sum256(info)
 	b.Hash = hash[:]
 }
 
 func CreateBlock(data string, prevHash []byte) *Block {
-	block := &Block{[]byte{}, []byte(data), prevHash}
+	block := &Block{time.Now().Unix(), []byte{}, []byte(data), prevHash}
 	block.DeriveHash()
 	return block
 }
